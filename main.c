@@ -127,10 +127,10 @@ int make_list(char* word,list_t *l){
                     return 0;
                 }
                 else{
-                cur = cur -> prev;
-                insert(l,cur,word);
-                return 0;
-            }}
+                    cur = cur -> prev;
+                    insert(l,cur,word);
+                    return 0;
+                }}
             cur = cur -> next;
         }
         push_back(l,word);
@@ -141,37 +141,52 @@ int make_word(list_t *l){
     FILE *f = fopen("C:\\Users\\User\\Desktop\\file.txt","rt");
     if (f == NULL)
         return -1;
-     char* mas = NULL;
-     char c;
-     int letter_count = 0,start_word_position = 0,i;
-     while((c = fgetc(f)) != EOF) {
-         letter_count++;
-         if (c == ' ' || c == '\n' || c == '\t') {
-             mas = (char*)malloc(letter_count * sizeof(char));
-             fseek(f,start_word_position,SEEK_SET);
-             start_word_position = start_word_position + letter_count;
-             i = 0;
-             while(letter_count != 0){
-                 mas[i++] = fgetc(f);
-                 letter_count--;
-             }
-             mas[i-1] = 0;
-             make_list(mas,l);
-         }
-     }
-     {
-         mas = malloc((letter_count+1) * sizeof(char));
-         fseek(f,start_word_position,SEEK_SET);
-         i = 0;
-         while(letter_count != 0){
-             mas[i++] = fgetc(f);
-             letter_count--;
-         }
-         mas[i] = 0;
-         make_list(mas,l);
-     }
-     fclose(f);
-     return 0;
+    char* mas = NULL;
+    char c;
+    int letter_count = 0,start_word_position = 0,i;
+    while((c = fgetc(f)) == ' ' || c == '\n' || c == '\t'){
+        if (c != '\n')
+            start_word_position++;
+        else
+            start_word_position += 2;
+    }
+    fseek(f,start_word_position,SEEK_SET);
+    while((c = fgetc(f)) != EOF) {
+        if (c == ' ' || c == '\n' || c == '\t') {
+            mas = (char*)malloc((letter_count+1) * sizeof(char));
+            fseek(f,start_word_position,SEEK_SET);
+            start_word_position = start_word_position + letter_count;
+            i = 0;
+            while(letter_count != 0){
+                mas[i++] = fgetc(f);
+                letter_count--;
+            }
+            mas[i] = 0;
+            make_list(mas,l);
+            while((c = fgetc(f)) == ' ' || c == '\n' || c == '\t'){
+                if (c != '\n')
+                    start_word_position++;
+                else
+                    start_word_position += 2;
+            }
+            fseek(f,start_word_position,SEEK_SET);
+        }
+        else letter_count++;
+    }
+    if (letter_count > 0)
+    {
+        mas = malloc((letter_count+1) * sizeof(char));
+        fseek(f,start_word_position,SEEK_SET);
+        i = 0;
+        while(letter_count != 0){
+            mas[i++] = fgetc(f);
+            letter_count--;
+        }
+        mas[i] = 0;
+        make_list(mas,l);
+    }
+    fclose(f);
+    return 0;
 }
 void erase_numbers(list_t *l){
     node_t *cur;
@@ -185,8 +200,8 @@ void erase_numbers(list_t *l){
             cur = l -> head;
             while (cur != NULL) {
                 if (cur->number == key) {
-                erase(l, cur);
-                break;
+                    erase(l, cur);
+                    break;
                 }
                 cur = cur -> next;
             }
@@ -194,7 +209,6 @@ void erase_numbers(list_t *l){
         }
         else printf("unknown number\n");
     }
-
 }
 
 int main() {
